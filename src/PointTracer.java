@@ -4,6 +4,7 @@ import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.geom.Ellipse2D;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -27,16 +28,18 @@ public class PointTracer {
 	private JFreeChart chart ;
 
 	static Color[] tbColors 
-	= new Color[]{	new Color(  Color.BLUE.getBlue()/255.0f, Color.BLUE.getGreen()/255.0f, Color.BLUE.getRed()/255.0f, 1f),
-					new Color(	Color.CYAN.getBlue()/255.0f, Color.CYAN.getGreen()/255.0f, Color.CYAN.getRed()/255.0f, 1f),
-					new Color(	Color.ORANGE.getBlue()/255.0f, Color.ORANGE.getGreen()/255.0f, Color.ORANGE.getRed()/255.0f, 1f),  
-					new Color(	Color.MAGENTA.getBlue()/255.0f, Color.MAGENTA.getGreen()/255.0f, Color.MAGENTA.getRed()/255.0f, 1f),
-					new Color(	Color.GREEN.getBlue()/255.0f, Color.GREEN.getGreen()/255.0f, Color.GREEN.getRed()/255.0f, 1f)};
+	= new Color[]{	new Color(  Color.BLUE.getRed()/255.0f, Color.BLUE.getGreen()/255.0f, Color.BLUE.getBlue()/255.0f, 1f),
+					new Color(	Color.CYAN.getRed()/255.0f, Color.CYAN.getGreen()/255.0f, Color.CYAN.getBlue()/255.0f, 1f),
+					new Color(	Color.ORANGE.getRed()/255.0f, Color.ORANGE.getGreen()/255.0f, Color.ORANGE.getBlue()/255.0f, 1f),  
+					new Color(	Color.MAGENTA.getRed()/255.0f, Color.MAGENTA.getGreen()/255.0f, Color.MAGENTA.getBlue()/255.0f, 1f),
+					new Color(	Color.GREEN.getRed()/255.0f, Color.GREEN.getGreen()/255.0f, Color.GREEN.getBlue()/255.0f, 1f)};
 
 	public PointTracer(List<Point> points, List<Point> pulsars){
 
+		List<Point> pointsList = points.stream().filter(f -> f!=null).collect(Collectors.toList());
+		
 		chart = ChartFactory.createXYLineChart(	"RA/DEC points with candidates", "FanBeam Number", "NS (deg)",
-				createDataSet(points, pulsars), PlotOrientation.VERTICAL, true, true, false);
+				createDataSet(pointsList, pulsars), PlotOrientation.VERTICAL, true, true, false);
 		chart.setBackgroundPaint( new Color(Integer.parseInt("f4f4f4", 16)));
 		chart.removeLegend();
 
@@ -56,7 +59,7 @@ public class PointTracer {
 
 		XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer)plot.getRenderer();
 		
-		for(int i=0;i< points.size(); i++) {
+		for(int i=0;i< pointsList.size(); i++) {
 			
 			renderer.setSeriesPaint(i, Color.GRAY);
 			renderer.setSeriesShape(i, ellipse);
@@ -69,7 +72,7 @@ public class PointTracer {
 		ellipse = new Ellipse2D.Double(-delta, -delta, size, size);
 		
 		int c = 0;
-		for(int i= points.size(); i< plot.getSeriesCount(); i++) {
+		for(int i= pointsList.size(); i< plot.getSeriesCount(); i++) {
 						
 			renderer.setSeriesPaint(i, c < 4 ? tbColors[c] : tbColors[4]);
 			renderer.setSeriesShape(i, ellipse);

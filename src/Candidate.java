@@ -15,9 +15,10 @@ public class Candidate {
 	String ra;
 	String dec;
 	String pngFileName;
-	String pointLine;
+	String pointLine; 
 	String candidateLine;
 	String bs;
+	PDMP pmdp;
 	
 	boolean init;
 	
@@ -29,8 +30,12 @@ public class Candidate {
 	
 	
 	
-	public Candidate(String pngFileName){
+	public Candidate(String pngFileName, PDMP pdmp){
+		
+		this.pmdp = pdmp;
 		this.pngFileName = pngFileName;
+		
+		System.err.println("Loading candidate: " + pngFileName);
 		
 		if(!pngFileName.contains(".")) return;
 		
@@ -42,7 +47,38 @@ public class Candidate {
 		
 		Integer lineNumber = Integer.parseInt(chunks[2]);
 		
-		candidateLine = pointsMap.get(bs).get(lineNumber);
+		/**
+		 * The string should be of the form HH:MM:SS+/-DD:MM:SS
+		 */
+		
+		char sign = pngFileName.contains("+")? '+' : '-';
+		
+		String raStr = pngFileName.substring(0,pngFileName.indexOf(sign));
+		String decStr = pngFileName.substring(pngFileName.indexOf(sign),pngFileName.indexOf("_"));
+		
+		String ra = raStr.substring(0,2) + ":" + raStr.substring(2,4) + ":" + raStr.substring(4,raStr.length());
+		String dec = decStr.substring(0,3) + ":" + decStr.substring(3,5) 
+						+ ":" + decStr.substring(5, decStr.length());
+
+		if(dec.contains("_")){
+			dec = dec.substring(0, dec.indexOf("_"));
+		}
+
+		System.err.println("Getting point for ra = " +ra + " dec = " + dec);
+		
+		candidateLine = null; 
+		
+		for(String s: pointsMap.get(bs)){
+			
+			if( s.contains(ra) && s.contains(dec) ) candidateLine = s;
+		}
+		
+		if(candidateLine == null){
+			System.err.println(" *******************Warning invalid PNG: " + pngFileName + "**********************");
+			return;
+		}
+		
+		System.err.println("candidate line: " + candidateLine);
 		
 		point = new Point(candidateLine);
 		
@@ -153,6 +189,18 @@ public class Candidate {
 
 	public static void setPointsMap(Map<String, List<String>> pointsMap) {
 		Candidate.pointsMap = pointsMap;
+	}
+
+
+
+	public PDMP getPmdp() {
+		return pmdp;
+	}
+
+
+
+	public void setPmdp(PDMP pmdp) {
+		this.pmdp = pmdp;
 	}
 	
 	
