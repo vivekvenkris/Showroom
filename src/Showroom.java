@@ -192,6 +192,11 @@ public class Showroom  extends Application{
 		final TextArea pointTA = new TextArea();
 		pointTA.setWrapText(true);
 		pointTA.setVisible(false); 
+		
+		final TextArea pulsarGuesserTA = new TextArea();
+		pulsarGuesserTA.setWrapText(true);
+		pulsarGuesserTA.setVisible(false); 
+
 
 
 		pointingBox.setCellFactory(Util.fileNameViewFactory);
@@ -296,7 +301,8 @@ public class Showroom  extends Application{
 				pdmpCommand.setVisible(false);
 				pointTA.setVisible(false);
 				pdmpBox.setVisible(false);
-				
+				pulsarGuesserTA.setVisible(false);
+
 				if(utcDirs.size() == 1){
 					
 					File utc = utcDirs.get(0);
@@ -441,7 +447,8 @@ public class Showroom  extends Application{
 					
 					pointTA.setText(candidates.get(count).getPoint().getFBPercents());
 					//pointTA.setText(candidates.get(count).getCandidateLine());
-					
+					pulsarGuesserTA.setText( PulsarGuesser.guessPulsar(candidates.get(count).getPmdp()));
+
 					PointTracer.addSeries(((ChartPanel)pointsChart.getContent()).getChart(),points.get(count),pulsarsInBeam.size() + points.size());
 					pointsChart.getContent().repaint();
 	
@@ -450,7 +457,8 @@ public class Showroom  extends Application{
 					pdmpCommand.setVisible(true);
 					pdmpBox.setVisible(true);
 					pointTA.setVisible(true);
-	
+					pulsarGuesserTA.setVisible(true);
+
 					makeDriven.setVisible(!new File(utcDir,Util.carsDotDriven).exists());
 					
 				}
@@ -582,6 +590,7 @@ public class Showroom  extends Application{
 					counterLabel.setText( (count+1) +"/"+images.size());
 				
 					pointTA.setText(candidates.get(count).getPoint().getFBPercents());
+					pulsarGuesserTA.setText( PulsarGuesser.guessPulsar(candidates.get(count).getPmdp()));
 
 					//pointTA.setText(points.get(count).toString());
 					PointTracer.addSeries(((ChartPanel)pointsChart.getContent()).getChart(),points.get(count),pulsarsInBeam.size() +  points.size());
@@ -623,6 +632,7 @@ public class Showroom  extends Application{
 				counterLabel.setText( (count+1) +"/"+images.size());
 				
 				pointTA.setText(candidates.get(count).getPoint().getFBPercents());
+				pulsarGuesserTA.setText( PulsarGuesser.guessPulsar(candidates.get(count).getPmdp()));
 
 				//pointTA.setText(points.get(count).toString());
 				PointTracer.addSeries(((ChartPanel)pointsChart.getContent()).getChart(),points.get(count),pulsarsInBeam.size() +  points.size());
@@ -653,6 +663,8 @@ public class Showroom  extends Application{
 					counterLabel.setText( (count+1) +"/"+images.size());
 					
 					pointTA.setText(candidates.get(count).getPoint().getFBPercents());
+					pulsarGuesserTA.setText( PulsarGuesser.guessPulsar(candidates.get(count).getPmdp()));
+
 					//pointTA.setText(points.get(count).toString());
 					PointTracer.addSeries(((ChartPanel)pointsChart.getContent()).getChart(),points.get(count),pulsarsInBeam.size() +  points.size());
 					pointsChart.getContent().repaint();
@@ -736,7 +748,7 @@ public class Showroom  extends Application{
 		VBox top = new VBox(10,title,subTitle,controlBox);
 		top.setAlignment(Pos.CENTER);
 		
-		VBox right = new VBox(10, pointsChart, pulsarPane);
+		VBox right = new VBox(10, pulsarGuesserTA, pointsChart, pulsarPane);
 		right.setAlignment(Pos.CENTER);
 
 		root.setTop(top);

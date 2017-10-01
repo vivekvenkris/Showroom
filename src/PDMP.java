@@ -28,6 +28,8 @@ public class PDMP{
 	
 	String line;
 	
+	String guess;
+	
 	private PDMP(){}
 	
 	public static PDMP dummy(String file){
@@ -47,8 +49,8 @@ public class PDMP{
 		this.line = line.trim();
 		this.sourceName = chunks[0]	;
 		
-		this.angleLAT = new Angle(chunks[1], Angle.DEG);
-		this.angleLON = new Angle(chunks[2], Angle.DEG);
+		this.angleLON = new Angle(chunks[1], Angle.DEG);
+		this.angleLAT = new Angle(chunks[2], Angle.DEG);
 		
 		SphericalCoordinate sc = JSOFA.jauG2icrs(angleLON.getRadianValue(), angleLAT.getRadianValue());
 		this.angleRA = new Angle(sc.alpha,Angle.HHMMSS);
@@ -194,6 +196,15 @@ public class PDMP{
 	public void setLine(String line) {
 		this.line = line;
 	}
+
+	public String getGuess() {
+		return guess;
+	}
+
+	public void setGuess(String guess) {
+		this.guess = guess;
+	}
+	
 	
 	
 	
