@@ -3,6 +3,8 @@ import java.util.List;
 
 import org.junit.experimental.max.MaxHistory;
 
+import com.gargoylesoftware.htmlunit.javascript.host.file.File;
+
 import bean.Angle;
 import bean.TBSourceTO;
 import manager.PSRCATManager;
@@ -22,7 +24,9 @@ public class PulsarGuesser {
 
 		
 		pulsars.stream().forEach(c -> {
+			
 			TBSourceTO f = (TBSourceTO)c;
+			
 			Double period = f.getP0() * 1000;
 			Double DM = f.getDM();
 			Angle ra = f.getAngleRA();
@@ -66,7 +70,6 @@ public class PulsarGuesser {
 			boolean closeInDM = false;
 			
 			if( Math.abs(Math.abs(DM - pdmp.getBestDM())/pdmp.getErrBestDM()) < 5  || Math.abs(DM - pdmp.getBestDM()) < 100 ){
-				//s += " DM:" + String.format("(%.3f - %.3f = %.3f)/%.3f = %.3f sigma", DM, pdmp.getBestDM(), Math.abs(DM - pdmp.getBestDM()), pdmp.getErrBestDM(),Math.abs(DM - pdmp.getBestDM())/pdmp.getErrBestDM());
 				s += " " + String.format("%.2f %.2f %.2f %.2f",DM, pdmp.getBestDM(),pdmp.getErrBestDM(),Math.abs(DM - pdmp.getBestDM())/pdmp.getErrBestDM());
 				closeInDM = true;
 			}
@@ -87,7 +90,7 @@ public class PulsarGuesser {
 		
 		String guess = "";
 		for(String s: shortlisted)  guess += s;
-		
+			
 		if(guess.equals("")) guess = "None.";
 		
 		return guess;

@@ -117,6 +117,10 @@ public class Showroom  extends Application{
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
+		
+		root.setOnMouseClicked(f -> {
+			root.requestFocus();
+		});
 
 
 		String rootDirName = "/smirf/results/";
@@ -192,17 +196,23 @@ public class Showroom  extends Application{
 		final TextArea pointTA = new TextArea();
 		pointTA.setWrapText(true);
 		pointTA.setVisible(false); 
-		
-		final TextArea pulsarGuesserTA = new TextArea();
+		 
+		final TextArea pulsarGuesserTA = new TextArea(); 
 		pulsarGuesserTA.setWrapText(true);
 		pulsarGuesserTA.setVisible(false); 
+		
+		final TextArea birdiesTA = new TextArea(); 
+		birdiesTA.setWrapText(true);
+		birdiesTA.setVisible(false); 
+		
+		
+ 
 
 
-
-		pointingBox.setCellFactory(Util.fileNameViewFactory);
+		pointingBox.setCellFactory(Util.fileNameViewFactory); 
 		pointingBox.setButtonCell((ListCell<File>) Util.fileNameViewFactory.call(null)); 
 		pointingBox.setUserData(Util.directoryFileFilter);
-
+ 
 		utcBox.setCellFactory(Util.fileNameViewFactory);
 		utcBox.setButtonCell((ListCell<File>) Util.fileNameViewFactory.call(null)); 
 		utcBox.setUserData(Util.directoryFileFilter);
@@ -302,7 +312,7 @@ public class Showroom  extends Application{
 				pointTA.setVisible(false);
 				pdmpBox.setVisible(false);
 				pulsarGuesserTA.setVisible(false);
-
+				birdiesTA.setVisible(false);
 				if(utcDirs.size() == 1){
 					
 					File utc = utcDirs.get(0);
@@ -329,7 +339,24 @@ public class Showroom  extends Application{
 				
 				File carsDir = new File(utcDir.getAbsolutePath()+ Util.pathSeparator + "cars");
 				
-				 List<File> pngList = Arrays.asList(carsDir.listFiles(Util.pngFileFilter));
+				List<File> pngList = Arrays.asList(carsDir.listFiles(Util.pngFileFilter));
+				
+				List<String> birdieList = Arrays.asList(utcDir.listFiles(Util.birdieFileFilter))
+												.stream()
+												.map( f -> {
+													try {
+														System.err.println("File: " + f.getAbsolutePath());
+														return Files.readAllLines(f.toPath());
+													} catch (IOException e2) {
+														e2.printStackTrace();
+														return null;
+													}
+												} )
+												.filter( f -> f != null)
+												.flatMap(List::stream)
+												.collect(Collectors.toList());
+				
+				System.err.println("birdies list:" + birdieList);
 				
 				Candidate.loadMap(utcDir);
 				
@@ -442,22 +469,24 @@ public class Showroom  extends Application{
 					thisImageView.setImage(images.get(count));
 					thisImageView.setUserData(imageFiles.get(count).getName());
 					
-					pdmpCommand.setValue("pdmp " + imageFiles.get(count)
+					pdmpCommand.setValue("pdmp -mc 40 " + imageFiles.get(count)
 					.getAbsolutePath().replaceAll(".png", ".car"));
 					
 					pointTA.setText(candidates.get(count).getPoint().getFBPercents());
 					//pointTA.setText(candidates.get(count).getCandidateLine());
 					pulsarGuesserTA.setText( PulsarGuesser.guessPulsar(candidates.get(count).getPmdp()));
-
+					birdiesTA.setText(String.join("\n", birdieList));
+					birdiesTA.setEditable(false);
 					PointTracer.addSeries(((ChartPanel)pointsChart.getContent()).getChart(),points.get(count),pulsarsInBeam.size() + points.size());
 					pointsChart.getContent().repaint();
 	
-					counterLabel.setText( (count+1) +"/"+images.size());
-					thisImageView.setVisible(true);
+					counterLabel.setText( (count+1) +"/"+images.size()); 
+					thisImageView.setVisible(true); 
 					pdmpCommand.setVisible(true);
 					pdmpBox.setVisible(true);
 					pointTA.setVisible(true);
 					pulsarGuesserTA.setVisible(true);
+					birdiesTA.setVisible(true);
 
 					makeDriven.setVisible(!new File(utcDir,Util.carsDotDriven).exists());
 					
@@ -581,7 +610,7 @@ public class Showroom  extends Application{
 					thisImageView.setImage(images.get(--count));
 					thisImageView.setUserData(imageFiles.get(count).getName());
 					
-					pdmpCommand.setValue("pdmp " + imageFiles.get(count)
+					pdmpCommand.setValue("pdmp -mc 40 " + imageFiles.get(count)
 					.getAbsolutePath().replaceAll(".png", ".car"));
 					
 					setImageBorder( utcBox.getValue(), imageFiles.get(count));
@@ -591,7 +620,6 @@ public class Showroom  extends Application{
 				
 					pointTA.setText(candidates.get(count).getPoint().getFBPercents());
 					pulsarGuesserTA.setText( PulsarGuesser.guessPulsar(candidates.get(count).getPmdp()));
-
 					//pointTA.setText(points.get(count).toString());
 					PointTracer.addSeries(((ChartPanel)pointsChart.getContent()).getChart(),points.get(count),pulsarsInBeam.size() +  points.size());
 					pointsChart.getContent().repaint();
@@ -623,7 +651,7 @@ public class Showroom  extends Application{
 				thisImageView.setImage(images.get(count));
 				thisImageView.setUserData(imageFiles.get(count).getName());
 
-				pdmpCommand.setValue("pdmp " + imageFiles.get(count)
+				pdmpCommand.setValue("pdmp -mc 40 " + imageFiles.get(count)
 				.getAbsolutePath().replaceAll(".png", ".car"));
 
 				setImageBorder( utcBox.getValue(), imageFiles.get(count));
@@ -655,7 +683,7 @@ public class Showroom  extends Application{
 					thisImageView.setImage(images.get(++count));
 					thisImageView.setUserData(imageFiles.get(count).getName());
 					
-					pdmpCommand.setValue("pdmp " + imageFiles.get(count)
+					pdmpCommand.setValue("pdmp -mc 40 " + imageFiles.get(count)
 					.getAbsolutePath().replaceAll(".png", ".car"));
 					
 					setImageBorder( utcBox.getValue(), imageFiles.get(count));
@@ -729,8 +757,8 @@ public class Showroom  extends Application{
 		HBox.setHgrow(pdmpCommand.getTextField(), Priority.ALWAYS);
 		pdmpBox.getChildren().addAll(thisImageViewHBox,
 				new HBox(10,previous,counterLabel,next, gotoCandidate.gethBox()), 
-				new HBox(10,new Label("categorize:"), rfi, pulsar, newCandiate, resetCandidateCategory)  ,
-				new HBox(10,makeDriven), pdmpCommand.gethBox(),
+				new HBox(10,new Label("categorize:"), rfi, pulsar, newCandiate, resetCandidateCategory,makeDriven)  ,
+				pdmpCommand.gethBox(),
 				new HBox(10, new Label("Points string"), pointTA));
 		pdmpBox.setVisible(false);
 
@@ -748,7 +776,7 @@ public class Showroom  extends Application{
 		VBox top = new VBox(10,title,subTitle,controlBox);
 		top.setAlignment(Pos.CENTER);
 		
-		VBox right = new VBox(10, pulsarGuesserTA, pointsChart, pulsarPane);
+		VBox right = new VBox(10, pulsarGuesserTA,birdiesTA, pointsChart, pulsarPane);
 		right.setAlignment(Pos.CENTER);
 
 		root.setTop(top);

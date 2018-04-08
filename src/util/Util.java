@@ -64,6 +64,19 @@ public interface Util {
 		}
 	};
 	
+	
+	FileFilter birdieFileFilter = new FileFilter() {
+
+		@Override
+		public boolean accept(File pathname) {
+			return pathname.getName().contains("birdies");
+		}
+		
+		@Override
+		public String toString(){
+			return "Birdie file filter";
+		}
+	};
 	FileFilter unprocessedPointingFilter = new FileFilter() {
 
 		@Override
