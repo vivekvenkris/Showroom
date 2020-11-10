@@ -23,11 +23,11 @@ public class PulsarGuesser {
 		
 
 		
-		pulsars.stream().forEach(c -> {
+		if (pulsars != null) pulsars.stream().forEach(c -> {
 			
 			TBSourceTO f = (TBSourceTO)c;
 			
-			Double period = f.getP0() * 1000;
+			Double period = f.getP0() != null ? f.getP0() * 1000: -1;
 			Double DM = f.getDM();
 			Angle ra = f.getAngleRA();
 			Angle dec = f.getAngleDEC();
@@ -68,7 +68,7 @@ public class PulsarGuesser {
 			}
 			
 			boolean closeInDM = false;
-			
+			if(pdmp.getBestDM()/pdmp.getErrBestDM()>3)
 			if( Math.abs(Math.abs(DM - pdmp.getBestDM())/pdmp.getErrBestDM()) < 5  || Math.abs(DM - pdmp.getBestDM()) < 100 ){
 				s += " " + String.format("%.2f %.2f %.2f %.2f",DM, pdmp.getBestDM(),pdmp.getErrBestDM(),Math.abs(DM - pdmp.getBestDM())/pdmp.getErrBestDM());
 				closeInDM = true;

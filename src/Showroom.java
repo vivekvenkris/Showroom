@@ -80,6 +80,7 @@ import javafx.util.Callback;
 import javafx.util.Pair;
 import manager.DBManager;
 import manager.ObservationManager;
+import service.DBService;
 import standalones.Point;
 import standalones.SMIRF_GetUniqStitches;
 import standalones.Traversal;
@@ -341,11 +342,14 @@ public class Showroom  extends Application{
 				
 				List<File> pngList = Arrays.asList(carsDir.listFiles(Util.pngFileFilter));
 				
-				List<String> birdieList = Arrays.asList(utcDir.listFiles(Util.birdieFileFilter))
+				List<String> birdieList = new ArrayList<>();
+				List<String> birdiePeriods = new ArrayList<>();
+				
+				birdieList = Arrays.asList(utcDir.listFiles(Util.birdieFileFilter))
 												.stream()
 												.map( f -> {
 													try {
-														System.err.println("File: " + f.getAbsolutePath());
+														//System.err.println("File: " + f.getAbsolutePath());
 														return Files.readAllLines(f.toPath());
 													} catch (IOException e2) {
 														e2.printStackTrace();
@@ -356,7 +360,9 @@ public class Showroom  extends Application{
 												.flatMap(List::stream)
 												.collect(Collectors.toList());
 				
-				System.err.println("birdies list:" + birdieList);
+				
+				
+				//System.err.println("birdies list:" + birdieList);
 				
 				Candidate.loadMap(utcDir);
 				
@@ -450,7 +456,7 @@ public class Showroom  extends Application{
 					pulsarsInBeam.addAll( new SMIRF_GetUniqStitches().getPointForPulsars(observationTO) ) ;
 					
 					pulsarPane.getTabs().clear();
-					populateTabs(pulsarPane, observationTO.getTiedBeamSources());
+					populateTabs(pulsarPane, observationTO);
 					
 					
 		
@@ -762,8 +768,10 @@ public class Showroom  extends Application{
 				new HBox(10, new Label("Points string"), pointTA));
 		pdmpBox.setVisible(false);
 
-		VBox controlBox = new VBox(10,new Label(),new HBox(10, new Label("Type:"), all, unprocessed, processed),rootDirLWT.gethBox(), 
-				new HBox(10,new Label("select pointing: "),pointingBox, new Label("Select UTC:"), utcBox,refresh), new HBox(10,pointingName));
+		VBox controlBox = new VBox(10,new Label(),
+									  new HBox(10, new Label("Type:"), all, unprocessed, processed, rootDirLWT.gethBox()), 
+									  new HBox(10,new Label("select pointing: "),pointingBox, new Label("Select UTC:"), utcBox,refresh,new HBox(10,pointingName))
+									);
 		
 		Label title = new Label("SHOWROOM");
 		Label subTitle =  new Label("THE SMIRF CANDIDATE VIEWER");
@@ -849,7 +857,7 @@ public class Showroom  extends Application{
 //		System.err.println(newCandidates);
 				
 
-		
+		 
 		if(knownPulsarCandidates.getOrDefault(utcDir.getName(), new HashSet<>()).contains(imageFile.getName())){
 			thisImageViewHBox.setStyle("-fx-border-color: " + pulsarColor + "; -fx-border-width: 5 ;");
 		}
@@ -873,7 +881,10 @@ public class Showroom  extends Application{
 
 	}
 	
-	public void populateTabs(TabPane tabPane, List<TBSourceTO> tbSourceTOs){
+	public void populateTabs(TabPane tabPane, ObservationTO observationTO){
+		
+		List<TBSourceTO> tbSourceTOs = observationTO.getTiedBeamSources();
+		if(tbSourceTOs == null) return;
 		int i=0;
 		for(TBSourceTO tbSourceTO: tbSourceTOs){
 			
@@ -895,7 +906,9 @@ public class Showroom  extends Application{
 			table.getItems().add( new Pair<String, Object>("DM:", tbSourceTO.getDM().toString()));
 			table.getItems().add( new Pair<String, Object>("P0:", tbSourceTO.getP0().toString()));
 			table.getItems().add( new Pair<String, Object>("F0:", tbSourceTO.getF0().toString()));
-			
+			table.getItems().add( new Pair<String, Object>("TB SNR:",
+					DBService.getPulsarSNRForObs(observationTO.getUtc(), tbSourceTO.getPsrName()).toString()));
+			 
 			String harmonics = "";
 			
 			for(int h = -8 ; h<= 8; h++ ){

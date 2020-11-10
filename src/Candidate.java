@@ -35,7 +35,7 @@ public class Candidate {
 		this.pmdp = pdmp;
 		this.pngFileName = pngFileName;
 		
-		System.err.println("Loading candidate: " + pngFileName);
+		//System.err.println("Loading candidate: " + pngFileName);
 		
 		if(!pngFileName.contains(".")) return;
 		
@@ -64,7 +64,7 @@ public class Candidate {
 			dec = dec.substring(0, dec.indexOf("_"));
 		}
 
-		System.err.println("Getting point for ra = " +ra + " dec = " + dec);
+		//System.err.println("Getting point for ra = " +ra + " dec = " + dec);
 		
 		candidateLine = null; 
 		
@@ -78,7 +78,7 @@ public class Candidate {
 			return;
 		}
 		
-		System.err.println("candidate line: " + candidateLine);
+		//System.err.println("candidate line: " + candidateLine);
 		
 		point = new Point(candidateLine);
 		
